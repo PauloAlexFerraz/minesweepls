@@ -2,12 +2,12 @@ import React from 'react'
 
 const Boardhead = (props) => {
 
-    let minutes = Math.floor(props.time / 60);
-    let seconds = props.time - minutes * 60 || 0;
+    let minutes = Math.floor(props.time / 60);        //calcula os minutos 
+    let seconds = props.time - minutes * 60 || 0;     // remove os minutos do tempo total e verifica os segundos restantes, se n houver segundos restantes define os segundos como 0
 
-    var formseconds = seconds < 10 ? `0${formseconds}` : seconds; // formseconds erro ns pq o "let" tambem da erro, nao sei o que é diz que esta a ser chamada antes de ser definidas
+    var formseconds = seconds < 10 ? `0${seconds}` : seconds; // tentei corrigir não sei se deu
 
-    let time = `${seconds}`;
+    let time = `${seconds}`;   // talvez isto n seja necessário isto cria uma string time com o valor dos segundos 
 
 
 
