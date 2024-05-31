@@ -1,13 +1,13 @@
 import React from 'react';
 
-const Cell = ({ cell, open, flag }) => {
-  const handleClick = () => {
-    open(cell);
+const Cell = ({ cell, open, flag }) => {   //recebe cell,open e flag
+  const handleClick = () => {   //chamada quando a célula for clicada 
+    open(cell);     //abre a célula passada por argumento
   };
 
-  const handleRightClick = (event) => {
+  const handleRightClick = (event) => {  // chamada quando o botão direito do rato for clicado
     event.preventDefault(); // Previne o menu de contexto padrão do navegador
-    flag(cell);
+    flag(cell);   //coloca na cell passada por argumento uma flag
   };
 
   return (
