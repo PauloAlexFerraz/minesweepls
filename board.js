@@ -5,21 +5,20 @@ class Board extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      rows: this.createBoard(props),
+      rows: Board.createBoard(props),
     };
   }
 
-  static getDerivedStateFromProps(nextProps, prevState) { //nao esta a funcionar o reset ns pq
-    if (prevState.openCells > nextProps.openCells) {
+  static getDerivedStateFromProps(nextProps, prevState) {
+    if (nextProps.status === 'reset') {
       return {
-        rows: this.createBoard(nextProps)
+        rows: Board.createBoard(nextProps)
       };
     }
-    return null; // Return null if no state update is needed erro
+    return null; 
   }
 
-
-  createBoard = (props) => {
+  static createBoard(props) {
     let board = [];
 
     for (let i = 0; i < props.rows; i++) {
@@ -47,68 +46,54 @@ class Board extends Component {
       }
     }
     return board;
-  };
-
-  open = (cell) => {
-
-    let synccountmines= new Promise(resolve =>{
-        let mines= this.findMines(cell);
-        resolve(mines);
-
-    })
-
-    synccountmines.then(numbermines =>{
-        
-
-    let rows = this.state.rows.map(row => row.slice());
-    let current = rows[cell.y][cell.x];
-
-
-    if (current.hasMine && this.props.openCells === 0) {
-      let newRows = this.createBoard(this.props);
-      this.setState({ rows: newRows }, () => {
-        this.open(cell);
-      });
-    } else {
-      if (!current.hasFlag && !current.isOpen) {
-        this.props.cellClick();
-        current.isOpen = true;
-        current.count=numbermines;
-
-        
-
-        this.setState({ rows });
-
-        if(!current.hasMine && numbermines==0){
-          this.findaroundcells(cell);
-        }
-
-        if(current.hasMine){
-          this.props.endGame()
-        }
-      }
-    }
-    })
-    
   }
 
+  open = (cell) => {
+    let synccountmines = new Promise(resolve => {
+      let mines = this.findMines(cell);
+      resolve(mines);
+    });
+
+    synccountmines.then(numbermines => {
+      let rows = this.state.rows.map(row => row.slice());
+      let current = rows[cell.y][cell.x];
+
+      if (current.hasMine && this.props.openCells === 0) {
+        let newRows = Board.createBoard(this.props);
+        this.setState({ rows: newRows }, () => {
+          this.open(cell);
+        });
+      } else {
+        if (!current.hasFlag && !current.isOpen) {
+          this.props.cellClick();
+          current.isOpen = true;
+          current.count = numbermines;
+
+          this.setState({ rows });
+
+          if (!current.hasMine && numbermines === 0) {
+            this.findaroundcells(cell);
+          }
+
+          if (current.hasMine) {
+            this.props.endGame();
+          }
+        }
+      }
+    });
+  }
 
   flag = cell => {
-    if(this.props.status=="ended"){
+    if (this.props.status === "ended") {
       return;
     }
 
-    let rows =this.state.rows;
+    let rows = this.state.rows;
 
-    cell.hasFlag=!cell.hasFlag;
-    this.setState({rows});
-    this.props.changeflagamount(cell.hasFlag ? 1:-1);
-
-    
-// tem que ficar a 0
-
+    cell.hasFlag = !cell.hasFlag;
+    this.setState({ rows });
+    this.props.changeflagamount(cell.hasFlag ? 1 : -1);
   }
-
 
   findMines = (cell) => {
     let mineProximity = 0;
@@ -129,26 +114,23 @@ class Board extends Component {
     return mineProximity;
   };
 
-  findaroundcells = cell =>{
-    let rows= this.state.rows;
+  findaroundcells = cell => {
+    let rows = this.state.rows;
 
-    for (let row =-1;row<=1;row++){
-      for (let col =-1;col<=1;col++){
+    for (let row = -1; row <= 1; row++) {
+      for (let col = -1; col <= 1; col++) {
         if (
           cell.y + row >= 0 &&
           cell.x + col >= 0 &&
           cell.y + row < rows.length &&
           cell.x + col < rows[0].length
         ) {
-         if (!rows[cell.y+row][cell.x+col].hasMine && !rows[cell.y+row][cell.x+col].isOpen){
-          this.open(rows[cell.y+row][cell.x+col]);
-         }
+          if (!rows[cell.y + row][cell.x + col].hasMine && !rows[cell.y + row][cell.x + col].isOpen) {
+            this.open(rows[cell.y + row][cell.x + col]);
+          }
         }
-
       }
     }
-
-
   }
 
   render() {
